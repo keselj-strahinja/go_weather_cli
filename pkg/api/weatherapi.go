@@ -12,8 +12,12 @@ import (
 
 func fetchData(url string) ([]byte, error) {
 	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("unexpected status code: %d; and failed to read body: %v", resp.StatusCode, err)
+		}
+		return nil, fmt.Errorf("unexpected status code: %d; body: %s", resp.StatusCode, string(bodyBytes))
 	}
 	defer resp.Body.Close()
 
